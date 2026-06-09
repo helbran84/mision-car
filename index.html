@@ -562,6 +562,7 @@
 <button class="music-toggle" id="musicToggle">🎵 Música: OFF</button>
 
 <canvas id="particlesCanvas"></canvas>
+<canvas id="binaryCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none;"></canvas>
 
 <div class="presentation" id="presentation">
     <div class="bg-sweep"></div>
@@ -919,6 +920,62 @@
     }
     animateParticles();
 
+    // --- BINARY RAIN (HACKER MODE) ---
+    const binaryCanvas = document.getElementById('binaryCanvas');
+    const bCtx = binaryCanvas.getContext('2d');
+    let binaryRunning = false;
+    let binaryAnim = null;
+    let drops = [];
+    const columns = 40;
+
+    function resizeBinary() {
+        binaryCanvas.width = window.innerWidth;
+        binaryCanvas.height = window.innerHeight;
+    }
+    resizeBinary();
+    window.addEventListener('resize', () => { resizeBinary(); if (binaryRunning) initDrops(); });
+
+    function initDrops() {
+        const colCount = Math.floor(binaryCanvas.width / 25);
+        drops = [];
+        for (let i = 0; i < colCount; i++) {
+            drops[i] = Math.random() * -binaryCanvas.height;
+        }
+    }
+
+    function drawBinary() {
+        if (!binaryRunning) return;
+        bCtx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+        bCtx.fillRect(0, 0, binaryCanvas.width, binaryCanvas.height);
+        bCtx.font = '16px monospace';
+        for (let i = 0; i < drops.length; i++) {
+            const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+            bCtx.fillStyle = drops[i] > 0 ? 'rgba(0, 255, 65, 0.9)' : 'rgba(0, 255, 65, 0.3)';
+            bCtx.fillText(char, i * 25, drops[i]);
+            drops[i] += 4;
+            if (drops[i] > binaryCanvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+        }
+        binaryAnim = requestAnimationFrame(drawBinary);
+    }
+
+    function startBinary() {
+        if (binaryRunning) return;
+        binaryRunning = true;
+        binaryCanvas.style.display = 'block';
+        initDrops();
+        bCtx.fillStyle = 'rgba(0, 0, 0, 1)';
+        bCtx.fillRect(0, 0, binaryCanvas.width, binaryCanvas.height);
+        drawBinary();
+    }
+
+    function stopBinary() {
+        binaryRunning = false;
+        if (binaryAnim) cancelAnimationFrame(binaryAnim);
+        binaryCanvas.style.display = 'none';
+    }
+
     // --- FLASH OVERLAY ---
     const flashOverlay = document.createElement('div');
     flashOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
@@ -1073,6 +1130,9 @@
         if (quizColors[index]) {
             triggerFlash(index);
             playAlertSound();
+            startBinary();
+        } else {
+            stopBinary();
         }
     }
 
