@@ -919,6 +919,55 @@
     }
     animateParticles();
 
+    // --- FLASH OVERLAY ---
+    const flashOverlay = document.createElement('div');
+    flashOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:50;pointer-events:none;opacity:0;transition:opacity 0.3s ease;';
+    document.body.appendChild(flashOverlay);
+
+    const quizColors = {
+        3: '#ff6b6b',
+        5: '#ffd93d',
+        7: '#6bcb77'
+    };
+
+    function triggerFlash(index) {
+        const color = quizColors[index];
+        if (!color) return;
+        flashOverlay.style.backgroundColor = color;
+        flashOverlay.style.opacity = '0.25';
+        setTimeout(() => { flashOverlay.style.opacity = '0'; }, 350);
+    }
+
+    function playAlertSound() {
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.linearRampToValueAtTime(440, now + 0.15);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(masterGain || audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'square';
+        osc2.frequency.setValueAtTime(660, now + 0.1);
+        osc2.frequency.linearRampToValueAtTime(330, now + 0.25);
+        gain2.gain.setValueAtTime(0.06, now + 0.1);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc2.connect(gain2);
+        gain2.connect(masterGain || audioCtx.destination);
+        osc2.start(now + 0.1);
+        osc2.stop(now + 0.3);
+    }
+
     // --- NAVEGACIÓN ---
     const slides = document.querySelectorAll('.slide');
     const prevBtn = document.getElementById('prevBtn');
@@ -948,6 +997,11 @@
         setTimeout(() => {
             slides.forEach(s => s.classList.remove('exit'));
         }, 800);
+
+        if (quizColors[index]) {
+            triggerFlash(index);
+            playAlertSound();
+        }
     }
 
     prevBtn.addEventListener('click', () => {
