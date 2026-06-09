@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISIÓN CAR</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .slide.exit {
+            opacity: 0;
+            transform: scale(1.05) translateY(-20px);
+        }
+
+        .bg-grid {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+
+        .bg-scanline {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 210, 255, 0.02) 2px,
+                rgba(0, 210, 255, 0.02) 4px
+            );
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 850px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: rgba(0, 210, 255, 0.3);
+            z-index: 2;
+            letter-spacing: 3px;
+        }
+
+        .badge-agent {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            color: #00d2ff;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 6px 18px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #00d2ff, #3a7bd5, #00d2ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease-in-out infinite;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            font-weight: 300;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+            display: inline-block;
+        }
+
+        .role-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            color: #00d2ff;
+            letter-spacing: 6px;
+            margin-bottom: 6px;
+        }
+
+        .agent-name {
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .agent-letter {
+            font-family: 'Orbitron', monospace;
+            font-size: 6rem;
+            font-weight: 900;
+            opacity: 0.08;
+            position: absolute;
+            right: 60px;
+            bottom: 60px;
+            color: #00d2ff;
+            z-index: 0;
+        }
+
+        .speech {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .speech em {
+            color: #00d2ff;
+            font-style: normal;
+        }
+
+        .highlight-c { color: #ff6b6b; }
+        .highlight-a { color: #ffd93d; }
+        .highlight-r { color: #6bcb77; }
+
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .nav button {
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            color: #fff;
+            padding: 10px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .nav button:hover {
+            background: rgba(0, 210, 255, 0.2);
+            border-color: #00d2ff;
+        }
+
+        .nav button:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 { top: -100px; left: -100px; background: #00d2ff; }
+        .glow-2 { bottom: -100px; right: -100px; background: #7c3aed; }
+
+        .letter-block {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .letter-item {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d2ff, transparent);
+            margin: 16px auto;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+        .delay-4 { animation-delay: 0.7s; }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d2ff, #7c3aed);
+            z-index: 20;
+            transition: width 0.6s ease;
+        }
+
+        .music-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        .music-toggle:hover {
+            background: rgba(0, 210, 255, 0.2);
+        }
+
+        .music-toggle.playing {
+            border-color: #6bcb77;
+            color: #6bcb77;
+        }
+
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            color: #00d2ff;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; letter-spacing: 4px; }
+            h2 { font-size: 1.4rem; }
+            .agent-name { font-size: 1.8rem; }
+            .speech { font-size: 0.95rem; }
+            .slide { padding: 30px; }
+            .agent-letter { font-size: 3rem; right: 20px; bottom: 20px; }
+            .nav button { padding: 8px 16px; font-size: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<button class="music-toggle" id="musicToggle">🎵 Música: OFF</button>
+
+<div class="presentation" id="presentation">
+
+    <!-- SLIDE 1: PORTADA -->
+    <div class="slide active" data-index="0">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="badge fade-in">Presentación Grupal</div>
+            <h1 class="fade-in delay-1">MISIÓN CAR</h1>
+            <div class="subtitle fade-in delay-2">Contexto · Acción · Resultado</div>
+            <div style="margin-top: 40px; opacity: 0.6; font-size: 0.85rem; letter-spacing: 4px; text-transform: uppercase;" class="fade-in delay-3">
+                Un equipo · Un método · Un objetivo
+            </div>
+        </div>
+        <span class="slide-number">01 / 07</span>
+    </div>
+
+    <!-- SLIDE 2: NICOL -->
+    <div class="slide" data-index="1">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="content">
+            <div class="badge">Presentador Inicial</div>
+            <div class="agent-name" style="color: #00d2ff;">NICOL</div>
+            <div class="divider"></div>
+            <div class="speech">
+                Bienvenidos. Somos un equipo de élite. No tenemos nombre. No tenemos expediente. Pero tenemos un método infalible: el protocolo <strong>CAR</strong>.
+                <br><br>
+                <strong>C</strong> — Contexto: la situación que enfrentamos.<br>
+                <strong>A</strong> — Acción: lo que hicimos.<br>
+                <strong>R</strong> — Resultado: lo que logramos.
+                <br><br>
+                Hoy no vinimos a hablar de teorías. Vinimos a presentar nuestras misiones. Les presento a los agentes.
+            </div>
+        </div>
+        <span class="slide-number">02 / 07</span>
+    </div>
+
+    <!-- SLIDE 3: ABRAHAM - C -->
+    <div class="slide" data-index="2">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1" style="background: #ff6b6b;"></div>
+        <div class="content">
+            <div class="badge" style="border-color: #ff6b6b; color: #ff6b6b;">Agente C · Contexto</div>
+            <div class="agent-name" style="color: #ff6b6b;">ABRAHAM</div>
+            <div class="role-title">C de CONTEXTO</div>
+            <div class="divider"></div>
+            <div class="speech">
+                Soy el <strong style="color:#ff6b6b;">Contexto</strong>. Soy el punto de partida. Sin mí no hay misión posible.
+                <br><br>
+                Soy estudiante de Desarrollo Web Full Stack. Vengo de una beca en <em>Fundación Pescar</em>, financiada por <em>JP Morgan</em>. Arranqué con Python, Java, HTML, CSS y SQL. Sin experiencia laboral, pero con muchas ganas.
+                <br><br>
+                Ese era mi escenario. Ese era mi contexto. Sin mí, la Acción y el Resultado no existen.
+            </div>
+        </div>
+        <div class="agent-letter" style="color: #ff6b6b;">C</div>
+        <span class="slide-number">03 / 07</span>
+    </div>
+
+    <!-- SLIDE 4: AGOS - A -->
+    <div class="slide" data-index="3">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1" style="background: #ffd93d;"></div>
+        <div class="content">
+            <div class="badge" style="border-color: #ffd93d; color: #ffd93d;">Agente A · Acción</div>
+            <div class="agent-name" style="color: #ffd93d;">AGOS</div>
+            <div class="role-title">A de ACCIÓN</div>
+            <div class="divider"></div>
+            <div class="speech">
+                Soy la <strong style="color:#ffd93d;">Acción</strong>. Si el Contexto es el mapa, yo soy el movimiento.
+                <br><br>
+                No me quedé esperando. Estudié, practiqué, me equivoqué, volví a intentar. Agarré proyectos, trabajé en equipo, aprendí a consumir APIs, a manejar bases de datos, a pararme frente a problemas reales.
+                <br><br>
+                La Acción es lo que transforma la intención en resultado. Yo soy ese paso al frente.
+            </div>
+        </div>
+        <div class="agent-letter" style="color: #ffd93d;">A</div>
+        <span class="slide-number">04 / 07</span>
+    </div>
+
+    <!-- SLIDE 5: ALBERT - R -->
+    <div class="slide" data-index="4">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1" style="background: #6bcb77;"></div>
+        <div class="content">
+            <div class="badge" style="border-color: #6bcb77; color: #6bcb77;">Agente R · Resultado</div>
+            <div class="agent-name" style="color: #6bcb77;">ALBERT</div>
+            <div class="role-title">R de RESULTADO</div>
+            <div class="divider"></div>
+            <div class="speech">
+                Soy el <strong style="color:#6bcb77;">Resultado</strong>. Soy lo que pasa cuando el Contexto se encuentra con la Acción.
+                <br><br>
+                Hoy tengo una base sólida. Sé trabajar en frontend y backend. Tengo lógica de programación, manejo de bases de datos, trabajo en equipo y metodologías ágiles.
+                <br><br>
+                Pero el resultado más importante es este: <em>estoy listo para mi primera oportunidad en IT</em>. Contexto + Acción = Resultado. La fórmula funciona.
+            </div>
+        </div>
+        <div class="agent-letter" style="color: #6bcb77;">R</div>
+        <span class="slide-number">05 / 07</span>
+    </div>
+
+    <!-- SLIDE 6: ANAHÍ -->
+    <div class="slide" data-index="5">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="badge">Presentadora Final</div>
+            <div class="agent-name" style="color: #00d2ff;">ANAHÍ</div>
+            <div class="divider"></div>
+            <div class="speech">
+                Contexto. Acción. Resultado.
+                <br><br>
+                Tres agentes. Tres fases. Un solo equipo.
+                <br><br>
+                Cada uno cumplió su rol. Pero el verdadero mensaje es este: no importa de dónde vengas ni con qué arranques. Si entendés tu contexto, actuás con decisión y medís tu resultado, podés cumplir cualquier misión.
+                <br><br>
+                <strong>Somos el equipo CAR. Y esto recién empieza.</strong>
+            </div>
+        </div>
+        <span class="slide-number">06 / 07</span>
+    </div>
+
+    <!-- SLIDE 7: CIERRE -->
+    <div class="slide" data-index="6">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="letter-block">
+                <span class="letter-item" style="border-color:#ff6b6b; color:#ff6b6b;">C</span>
+                <span style="font-size:3rem; color:rgba(255,255,255,0.2);">+</span>
+                <span class="letter-item" style="border-color:#ffd93d; color:#ffd93d;">A</span>
+                <span style="font-size:3rem; color:rgba(255,255,255,0.2);">+</span>
+                <span class="letter-item" style="border-color:#6bcb77; color:#6bcb77;">R</span>
+            </div>
+            <h2 style="margin-top: 20px; color: #fff;">¿Preguntas?</h2>
+            <div class="divider"></div>
+            <div class="speech" style="font-size:0.95rem; color:rgba(255,255,255,0.5);">
+                Misión cumplida. Por ahora.
+            </div>
+        </div>
+        <span class="slide-number">07 / 07</span>
+    </div>
+
+</div>
+
+<div class="nav">
+    <button id="prevBtn" disabled>◄ Anterior</button>
+    <button id="nextBtn">Siguiente ►</button>
+</div>
+
+<script>
+    // --- NAVEGACIÓN ---
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressBar = document.getElementById('progressBar');
+    let current = 0;
+    const total = slides.length;
+
+    function updateNav() {
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+        progressBar.style.width = `${((current + 1) / total) * 100}%`;
+    }
+
+    function goTo(index) {
+        if (index === current) return;
+        slides.forEach((s, i) => {
+            s.classList.remove('active', 'exit');
+            if (i === index) s.classList.add('active');
+            if (i === current) {
+                if (index > current) s.classList.add('exit');
+                else s.classList.add('exit');
+            }
+        });
+        current = index;
+        updateNav();
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (current > 0) goTo(current - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (current < total - 1) goTo(current + 1);
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            if (current < total - 1) goTo(current + 1);
+        }
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            if (current > 0) goTo(current - 1);
+        }
+    });
+
+    updateNav();
+
+    // --- MÚSICA DE FONDO (Web Audio API) ---
+    let audioCtx = null;
+    let isPlaying = false;
+    let gainNode = null;
+    const musicBtn = document.getElementById('musicToggle');
+
+    function createSpyMusic() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.08;
+        gainNode.connect(audioCtx.destination);
+
+        // Spy bass line loop (low dramatic notes)
+        const notes = [130.81, 146.83, 164.81, 174.61, 185.00, 196.00, 220.00, 246.94];
+        let step = 0;
+        let interval;
+
+        function playNote() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.value = notes[step % notes.length] * 0.5;
+
+            noteGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+
+            osc.connect(noteGain);
+            noteGain.connect(gainNode);
+
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.6);
+
+            step++;
+
+            if (step % 4 === 0) {
+                const osc2 = audioCtx.createOscillator();
+                const g2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.value = notes[(step / 2) % notes.length] * 2;
+                g2.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc2.connect(g2);
+                g2.connect(gainNode);
+                osc2.start(audioCtx.currentTime);
+                osc2.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        playNote();
+        interval = setInterval(playNote, 800);
+
+        // Add subtle drone
+        const drone = audioCtx.createOscillator();
+        const droneGain = audioCtx.createGain();
+        drone.type = 'sine';
+        drone.frequency.value = 65.41;
+        droneGain.gain.value = 0.02;
+        drone.connect(droneGain);
+        droneGain.connect(gainNode);
+        drone.start();
+
+        return { interval, drone };
+    }
+
+    let musicObjects = null;
+
+    musicBtn.addEventListener('click', () => {
+        if (!isPlaying) {
+            musicObjects = createSpyMusic();
+            isPlaying = true;
+            musicBtn.textContent = '🎵 Música: ON';
+            musicBtn.classList.add('playing');
+        } else {
+            if (musicObjects) {
+                clearInterval(musicObjects.interval);
+                if (musicObjects.drone) musicObjects.drone.stop();
+            }
+            if (audioCtx) audioCtx.close();
+            audioCtx = null;
+            musicObjects = null;
+            isPlaying = false;
+            musicBtn.textContent = '🎵 Música: OFF';
+            musicBtn.classList.remove('playing');
+        }
+    });
+</script>
+
+</body>
+</html>
