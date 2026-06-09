@@ -557,22 +557,23 @@
                 Según el contexto del Agente Abraham, ¿cuál de estos <strong>no forma parte</strong> de la base técnica que construyó en Fundación Pescar?
             </div>
             <div class="quiz-options" id="quiz1">
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="Python sí forma parte de su base. La mencionó como parte de su stack.">
                     <span class="color-dot blue"></span> Python
                 </div>
-                <div class="quiz-option" data-correct="true">
+                <div class="quiz-option" data-correct="true" data-feedback="">
                     <span class="color-dot green"></span> Node.js
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="HTML y CSS son la base del frontend y sí los mencionó en su contexto.">
                     <span class="color-dot yellow"></span> HTML y CSS
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="SQL también forma parte del stack que mencionó. Lo maneja en bases de datos relacionales.">
                     <span class="color-dot red"></span> SQL
                 </div>
             </div>
             <div class="quiz-feedback" id="feedback1">
                 <div class="speaker">🎤 Nicol:</div>
-                <div class="text">"Exacto. Node.js no estaba en ese contexto. Pero no se preocupen, pronto se suma al arsenal. La base ya está. Agente Agos, proceda con la Acción."</div>
+                <div class="text correct-text">"Exacto. Node.js no estaba en ese contexto. Pero no se preocupen, pronto se suma al arsenal. La base ya está. Agente Agos, proceda con la Acción."</div>
+                <div class="text wrong-text" style="display:none;"></div>
             </div>
         </div>
         <span class="slide-number">04 / 10</span>
@@ -612,22 +613,23 @@
                 En la fase de Acción, ¿cuál es el <strong>peor error</strong> que puede cometer un desarrollador al hablar con un reclutador?
             </div>
             <div class="quiz-options" id="quiz2">
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="Decir que trabajaste en equipo está bien, pero no es un error. El problema es no aclarar qué rol cumpliste vos.">
                     <span class="color-dot blue"></span> Decir que trabajó en equipo.
                 </div>
-                <div class="quiz-option" data-correct="true">
+                <div class="quiz-option" data-correct="true" data-feedback="">
                     <span class="color-dot green"></span> Hablar solo en plural ("hicimos") sin decir qué hizo él específicamente.
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="Admitir errores muestra aprendizaje. Eso suma, no resta. El problema es no individualizar tu aporte.">
                     <span class="color-dot yellow"></span> Admitir que se equivocó y volvió a intentar.
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="Explicar cómo consumiste una API es excelente. Mostrás conocimiento técnico concreto. El error es no usar el 'yo'.">
                     <span class="color-dot red"></span> Explicar cómo consumió una API.
                 </div>
             </div>
             <div class="quiz-feedback" id="feedback2">
                 <div class="speaker">🎤 Agos:</div>
-                <div class="text">"Tal cual. Si no te adueñás de tus acciones, el reclutador no sabe qué sabés hacer vos. Ahora sí, Albert, mostrales el impacto."</div>
+                <div class="text correct-text">"Tal cual. Si no te adueñás de tus acciones, el reclutador no sabe qué sabés hacer vos. Ahora sí, Albert, mostrales el impacto."</div>
+                <div class="text wrong-text" style="display:none;"></div>
             </div>
         </div>
         <span class="slide-number">06 / 10</span>
@@ -667,22 +669,23 @@
                 ¿Por qué el método CAR es el <strong>arma secreta</strong> de un Junior sin experiencia laboral previa?
             </div>
             <div class="quiz-options" id="quiz3">
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="Ningún método te hace parecer senior de la nada. CAR no es magia, es estructura. Te ayuda a comunicar lo que sabés.">
                     <span class="color-dot blue"></span> Porque te hace parecer senior mágicamente.
                 </div>
-                <div class="quiz-option" data-correct="true">
+                <div class="quiz-option" data-correct="true" data-feedback="">
                     <span class="color-dot green"></span> Porque demuestra con hechos y lógica tu potencial real.
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="CAR no es memorizar, es saber contar tu historia con estructura. El CV se memoriza solo. El método te da claridad.">
                     <span class="color-dot yellow"></span> Porque te ayuda a memorizar el currículum.
                 </div>
-                <div class="quiz-option" data-correct="false">
+                <div class="quiz-option" data-correct="false" data-feedback="No es una fórmula mágica ni un hack. CAR es una forma ordenada de presentar tu experiencia. Nada de hacking.">
                     <span class="color-dot red"></span> Porque es una fórmula matemática para hackear sistemas.
                 </div>
             </div>
             <div class="quiz-feedback" id="feedback3">
                 <div class="speaker">🎤 Albert:</div>
-                <div class="text">"Exacto, agentes del público. El CAR transforma el 'no tengo experiencia' en 'sé cómo resolver problemas'. Anahí, el escenario es tuyo."</div>
+                <div class="text correct-text">"Exacto, agentes del público. El CAR transforma el 'no tengo experiencia' en 'sé cómo resolver problemas'. Anahí, el escenario es tuyo."</div>
+                <div class="text wrong-text" style="display:none;"></div>
             </div>
         </div>
         <span class="slide-number">08 / 10</span>
@@ -880,6 +883,8 @@
         const slide = optionsContainer.closest('.slide');
         const feedbackId = optionsContainer.id.replace('quiz', 'feedback');
         const feedback = document.getElementById(feedbackId);
+        const correctText = feedback.querySelector('.correct-text');
+        const wrongText = feedback.querySelector('.wrong-text');
 
         options.forEach(opt => {
             opt.addEventListener('click', () => {
@@ -892,6 +897,15 @@
                 });
                 if (isCorrect) opt.classList.add('correct');
                 slide.dataset.answered = 'true';
+
+                if (isCorrect) {
+                    correctText.style.display = '';
+                    wrongText.style.display = 'none';
+                } else {
+                    correctText.style.display = 'none';
+                    wrongText.style.display = '';
+                    wrongText.textContent = '❌ ' + opt.dataset.feedback;
+                }
                 feedback.classList.add('show');
                 updateNav();
             });
