@@ -912,7 +912,7 @@
         });
     });
 
-    // --- MÚSICA DE FONDO (Web Audio API) - Más movida ---
+    // --- MÚSICA DE FONDO (Web Audio API) - Cinematic Spy Theme ---
     let audioCtx = null;
     let isPlaying = false;
     let gainNode = null;
@@ -922,82 +922,171 @@
         if (audioCtx) return;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.06;
+        gainNode.gain.value = 0.055;
         gainNode.connect(audioCtx.destination);
 
-        // Techno spy action beats
-        const bassNotes = [65.41, 73.42, 82.41, 87.31, 98.00, 110.00, 123.47, 130.81];
+        // Cinematic orchestral/spy sequence
+        const bassLine = [55, 61.74, 65.41, 73.42, 82.41, 73.42, 65.41, 61.74];
+        const melodyPhrase = [261.63, 311.13, 369.99, 415.30, 369.99, 311.13, 261.63, 311.13, 369.99, 440.00, 523.25, 440.00, 369.99, 329.63, 293.66, 261.63];
+        const arpNotes = [523.25, 659.25, 783.99, 659.25, 783.99, 1046.50, 783.99, 659.25];
         let step = 0;
         let beatCount = 0;
         let interval;
 
         function playBeat() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
 
-            // Bass kick (every beat)
-            const kick = audioCtx.createOscillator();
-            const kickGain = audioCtx.createGain();
-            kick.type = 'sine';
-            kick.frequency.setValueAtTime(bassNotes[step % bassNotes.length] * 0.3, audioCtx.currentTime);
-            kick.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.15);
-            kickGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
-            kickGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-            kick.connect(kickGain);
-            kickGain.connect(gainNode);
-            kick.start(audioCtx.currentTime);
-            kick.stop(audioCtx.currentTime + 0.2);
-
-            // Hi-hat (offbeats)
-            if (beatCount % 2 === 1) {
-                const hat = audioCtx.createOscillator();
-                const hatGain = audioCtx.createGain();
-                hat.type = 'square';
-                hat.frequency.value = 8000;
-                hatGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                hatGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                hat.connect(hatGain);
-                hatGain.connect(gainNode);
-                hat.start(audioCtx.currentTime);
-                hat.stop(audioCtx.currentTime + 0.05);
+            // Kick drum (strong, cinematic)
+            if (beatCount % 4 === 0) {
+                const kick = audioCtx.createOscillator();
+                const kickGain = audioCtx.createGain();
+                kick.type = 'sine';
+                kick.frequency.setValueAtTime(80, now);
+                kick.frequency.exponentialRampToValueAtTime(25, now + 0.2);
+                kickGain.gain.setValueAtTime(0.35, now);
+                kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                kick.connect(kickGain);
+                kickGain.connect(gainNode);
+                kick.start(now);
+                kick.stop(now + 0.3);
             }
 
-            // Melody phrase every 8 beats
-            if (beatCount % 8 === 0) {
-                const melody = audioCtx.createOscillator();
-                const melodyGain = audioCtx.createGain();
-                melody.type = 'sawtooth';
-                const melodyNotes = [261.63, 329.63, 392.00, 349.23, 293.66, 349.23, 392.00, 440.00];
-                const note = melodyNotes[step % melodyNotes.length];
-                melody.frequency.value = note;
-                melodyGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                melodyGain.gain.setValueAtTime(0.06, audioCtx.currentTime + 0.5);
-                melodyGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-                melody.connect(melodyGain);
-                melodyGain.connect(gainNode);
-                melody.start(audioCtx.currentTime);
-                melody.stop(audioCtx.currentTime + 0.8);
-                step++;
+            // Snare/clap on beat 2 and 4
+            if (beatCount % 4 === 1 || beatCount % 4 === 3) {
+                const noise = audioCtx.createOscillator();
+                const noiseGain = audioCtx.createGain();
+                noise.type = 'sawtooth';
+                noise.frequency.value = 150;
+                noiseGain.gain.setValueAtTime(0.08, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                noise.connect(noiseGain);
+                noiseGain.connect(gainNode);
+                noise.start(now);
+                noise.stop(now + 0.12);
+
+                const snap = audioCtx.createOscillator();
+                const snapGain = audioCtx.createGain();
+                snap.type = 'square';
+                snap.frequency.value = 4000;
+                snapGain.gain.setValueAtTime(0.03, now);
+                snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+                snap.connect(snapGain);
+                snapGain.connect(gainNode);
+                snap.start(now);
+                snap.stop(now + 0.04);
+            }
+
+            // Hi-hat pattern (eighth notes)
+            const hat = audioCtx.createOscillator();
+            const hatGain = audioCtx.createGain();
+            hat.type = 'square';
+            hat.frequency.value = 6000 + Math.random() * 2000;
+            hatGain.gain.setValueAtTime(0.025, now);
+            hatGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+            hat.connect(hatGain);
+            hatGain.connect(gainNode);
+            hat.start(now);
+            hat.stop(now + 0.03);
+
+            // Bass (every 2 beats - walking spy bass)
+            if (beatCount % 2 === 0) {
+                const bass = audioCtx.createOscillator();
+                const bassGain = audioCtx.createGain();
+                bass.type = 'sawtooth';
+                const bassNote = bassLine[Math.floor(step / 2) % bassLine.length];
+                bass.frequency.value = bassNote;
+                bassGain.gain.setValueAtTime(0.12, now);
+                bassGain.gain.setValueAtTime(0.12, now + 0.35);
+                bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                bass.connect(bassGain);
+                bassGain.connect(gainNode);
+                bass.start(now);
+                bass.stop(now + 0.5);
+            }
+
+            // Arpeggiated synth (every 4 beats)
+            if (beatCount % 4 === 0) {
+                for (let a = 0; a < 4; a++) {
+                    const arp = audioCtx.createOscillator();
+                    const arpGain = audioCtx.createGain();
+                    arp.type = 'sine';
+                    const arpNote = arpNotes[(step + a) % arpNotes.length];
+                    arp.frequency.value = arpNote;
+                    const startTime = now + a * 0.12;
+                    arpGain.gain.setValueAtTime(0.035, startTime);
+                    arpGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
+                    arp.connect(arpGain);
+                    arpGain.connect(gainNode);
+                    arp.start(startTime);
+                    arp.stop(startTime + 0.1);
+                }
+            }
+
+            // Melody phrase (every 16 beats - cinematic hook)
+            if (beatCount % 16 === 0) {
+                for (let m = 0; m < 8; m++) {
+                    const mel = audioCtx.createOscillator();
+                    const melGain = audioCtx.createGain();
+                    mel.type = 'triangle';
+                    const melNote = melodyPhrase[(Math.floor(step / 4) + m) % melodyPhrase.length];
+                    mel.frequency.value = melNote;
+                    const startTime = now + m * 0.3;
+                    melGain.gain.setValueAtTime(0.04, startTime);
+                    melGain.gain.setValueAtTime(0.04, startTime + 0.2);
+                    melGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.28);
+                    mel.connect(melGain);
+                    melGain.connect(gainNode);
+                    mel.start(startTime);
+                    mel.stop(startTime + 0.28);
+                }
+            }
+
+            // Tension riser every 32 beats
+            if (beatCount % 32 === 28) {
+                for (let r = 0; r < 4; r++) {
+                    const rise = audioCtx.createOscillator();
+                    const riseGain = audioCtx.createGain();
+                    rise.type = 'sine';
+                    rise.frequency.setValueAtTime(200 + r * 100, now + r * 0.15);
+                    rise.frequency.linearRampToValueAtTime(800 + r * 200, now + r * 0.15 + 0.3);
+                    riseGain.gain.setValueAtTime(0.02, now + r * 0.15);
+                    riseGain.gain.exponentialRampToValueAtTime(0.001, now + r * 0.15 + 0.3);
+                    rise.connect(riseGain);
+                    riseGain.connect(gainNode);
+                    rise.start(now + r * 0.15);
+                    rise.stop(now + r * 0.15 + 0.3);
+                }
             }
 
             beatCount++;
             if (beatCount % 2 === 0) step++;
         }
 
-        // Start immediately
         playBeat();
-        interval = setInterval(playBeat, 250);
+        interval = setInterval(playBeat, 187);
 
-        // Bass drone
+        // Low drone (suspense)
         const drone = audioCtx.createOscillator();
         const droneGain = audioCtx.createGain();
         drone.type = 'sine';
-        drone.frequency.value = 55;
-        droneGain.gain.value = 0.015;
+        drone.frequency.value = 41.2;
+        droneGain.gain.value = 0.012;
         drone.connect(droneGain);
         droneGain.connect(gainNode);
         drone.start();
 
-        return { interval, drone };
+        // Subtle pad
+        const pad = audioCtx.createOscillator();
+        const padGain = audioCtx.createGain();
+        pad.type = 'sine';
+        pad.frequency.value = 130.81;
+        padGain.gain.value = 0.008;
+        pad.connect(padGain);
+        padGain.connect(gainNode);
+        pad.start();
+
+        return { interval, drone, pad };
     }
 
     let musicObjects = null;
@@ -1012,6 +1101,7 @@
             if (musicObjects) {
                 clearInterval(musicObjects.interval);
                 if (musicObjects.drone) musicObjects.drone.stop();
+                if (musicObjects.pad) musicObjects.pad.stop();
             }
             if (audioCtx) audioCtx.close();
             audioCtx = null;
