@@ -992,6 +992,54 @@
         }
     }
 
+    function playUnlockSound() {
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+
+        // Blip ascendente (acceso concedido)
+        const blip1 = audioCtx.createOscillator();
+        const blip1Gain = audioCtx.createGain();
+        blip1.type = 'sine';
+        blip1.frequency.setValueAtTime(523.25, now);
+        blip1.frequency.linearRampToValueAtTime(659.25, now + 0.06);
+        blip1Gain.gain.setValueAtTime(0.1, now);
+        blip1Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        blip1.connect(blip1Gain);
+        blip1Gain.connect(masterGain || audioCtx.destination);
+        blip1.start(now);
+        blip1.stop(now + 0.1);
+
+        // Segundo blip más agudo
+        const blip2 = audioCtx.createOscillator();
+        const blip2Gain = audioCtx.createGain();
+        blip2.type = 'sine';
+        blip2.frequency.setValueAtTime(783.99, now + 0.08);
+        blip2.frequency.linearRampToValueAtTime(1046.50, now + 0.14);
+        blip2Gain.gain.setValueAtTime(0.12, now + 0.08);
+        blip2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        blip2.connect(blip2Gain);
+        blip2Gain.connect(masterGain || audioCtx.destination);
+        blip2.start(now + 0.08);
+        blip2.stop(now + 0.2);
+
+        // Arpegio final de confirmación
+        const arpNotes = [523.25, 659.25, 783.99, 1046.50];
+        arpNotes.forEach((freq, i) => {
+            const arp = audioCtx.createOscillator();
+            const arpGain = audioCtx.createGain();
+            arp.type = 'triangle';
+            arp.frequency.value = freq;
+            const t = now + 0.15 + i * 0.05;
+            arpGain.gain.setValueAtTime(0.08, t);
+            arpGain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+            arp.connect(arpGain);
+            arpGain.connect(masterGain || audioCtx.destination);
+            arp.start(t);
+            arp.stop(t + 0.08);
+        });
+    }
+
     // --- NAVEGACIÓN ---
     const slides = document.querySelectorAll('.slide');
     const prevBtn = document.getElementById('prevBtn');
@@ -1076,6 +1124,7 @@
                 if (isCorrect) {
                     correctText.style.display = '';
                     wrongText.style.display = 'none';
+                    playUnlockSound();
                 } else {
                     correctText.style.display = 'none';
                     wrongText.style.display = '';
