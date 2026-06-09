@@ -315,14 +315,115 @@
             color: #6bcb77;
         }
 
-        .typing-cursor::after {
-            content: '|';
-            animation: blink 1s step-end infinite;
-            color: #00d2ff;
+        /* --- QUIZ STYLES --- */
+        .quiz-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            line-height: 1.5;
         }
 
-        @keyframes blink {
-            50% { opacity: 0; }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .quiz-option {
+            padding: 18px 24px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.04);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .quiz-option:hover:not(.disabled) {
+            border-color: rgba(0, 210, 255, 0.5);
+            background: rgba(0, 210, 255, 0.08);
+            transform: scale(1.02);
+        }
+
+        .quiz-option .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .quiz-option .color-dot.blue { background: #2196F3; }
+        .quiz-option .color-dot.green { background: #4CAF50; }
+        .quiz-option .color-dot.yellow { background: #FFC107; }
+        .quiz-option .color-dot.red { background: #f44336; }
+
+        .quiz-option.correct {
+            border-color: #4CAF50 !important;
+            background: rgba(76, 175, 80, 0.15) !important;
+        }
+
+        .quiz-option.wrong {
+            border-color: #f44336 !important;
+            background: rgba(244, 67, 54, 0.15) !important;
+        }
+
+        .quiz-option.disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .quiz-option.disabled.correct {
+            opacity: 1;
+        }
+
+        .quiz-feedback {
+            margin-top: 24px;
+            padding: 16px 24px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 700px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+        }
+
+        .quiz-feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .quiz-feedback .speaker {
+            font-weight: 600;
+            color: #00d2ff;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .quiz-feedback .text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .quiz-header {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: #ffd93d;
+            border: 1px solid rgba(255, 217, 61, 0.3);
+            padding: 6px 18px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            background: rgba(255, 217, 61, 0.05);
         }
 
         @media (max-width: 768px) {
@@ -333,6 +434,8 @@
             .slide { padding: 30px; }
             .agent-letter { font-size: 3rem; right: 20px; bottom: 20px; }
             .nav button { padding: 8px 16px; font-size: 0.6rem; }
+            .quiz-options { grid-template-columns: 1fr; }
+            .quiz-question { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -344,7 +447,7 @@
 
 <div class="presentation" id="presentation">
 
-    <!-- SLIDE 1: PORTADA -->
+    <!-- SLIDE 0: PORTADA -->
     <div class="slide active" data-index="0">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
@@ -358,10 +461,10 @@
                 Un equipo · Un método · Un objetivo
             </div>
         </div>
-        <span class="slide-number">01 / 07</span>
+        <span class="slide-number">01 / 10</span>
     </div>
 
-    <!-- SLIDE 2: NICOL -->
+    <!-- SLIDE 1: NICOL -->
     <div class="slide" data-index="1">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
@@ -380,10 +483,10 @@
                 Hoy no vinimos a hablar de teorías. Vinimos a presentar nuestras misiones. Les presento a los agentes.
             </div>
         </div>
-        <span class="slide-number">02 / 07</span>
+        <span class="slide-number">02 / 10</span>
     </div>
 
-    <!-- SLIDE 3: ABRAHAM - C -->
+    <!-- SLIDE 2: ABRAHAM - C -->
     <div class="slide" data-index="2">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
@@ -396,17 +499,50 @@
             <div class="speech">
                 Soy el <strong style="color:#ff6b6b;">Contexto</strong>. Soy el punto de partida. Sin mí no hay misión posible.
                 <br><br>
-                Soy estudiante de Desarrollo Web Full Stack. Vengo de una beca en <em>Fundación Pescar</em>, financiada por <em>JP Morgan</em>. Arranqué con Python, Java, HTML, CSS y SQL. Sin experiencia laboral, pero con muchas ganas.
+                Soy estudiante de Desarrollo Web Full Stack. Vengo de una beca en <em>Fundación Pescar</em>, financiada por <em>JP Morgan</em>. Arranqué con <strong>Python, Java, HTML, CSS y SQL</strong>. Sin experiencia laboral, pero con muchas ganas.
                 <br><br>
                 Ese era mi escenario. Ese era mi contexto. Sin mí, la Acción y el Resultado no existen.
             </div>
         </div>
         <div class="agent-letter" style="color: #ff6b6b;">C</div>
-        <span class="slide-number">03 / 07</span>
+        <span class="slide-number">03 / 10</span>
+    </div>
+
+    <!-- SLIDE 3: DESAFÍO 1 (NICOL) -->
+    <div class="slide quiz-slide" data-index="3">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="quiz-header">🔐 Desafío 1 · Validación de Contexto</div>
+            <div class="quiz-question">
+                ¿Cuál de estas tecnologías <strong>NO</strong> nombró el Agente Abraham en su Contexto de Fundación Pescar?
+            </div>
+            <div class="quiz-options" id="quiz1">
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot blue"></span> Python
+                </div>
+                <div class="quiz-option" data-correct="true">
+                    <span class="color-dot green"></span> Node.js
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot yellow"></span> Java
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot red"></span> SQL
+                </div>
+            </div>
+            <div class="quiz-feedback" id="feedback1">
+                <div class="speaker">🎤 Nicol:</div>
+                <div class="text">"¡Excelente memoria! No caímos en la trampa. Sistema liberado. Agente Agos, proceda con la Acción."</div>
+            </div>
+        </div>
+        <span class="slide-number">04 / 10</span>
     </div>
 
     <!-- SLIDE 4: AGOS - A -->
-    <div class="slide" data-index="3">
+    <div class="slide" data-index="4">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
         <div class="glow glow-1" style="background: #ffd93d;"></div>
@@ -424,11 +560,44 @@
             </div>
         </div>
         <div class="agent-letter" style="color: #ffd93d;">A</div>
-        <span class="slide-number">04 / 07</span>
+        <span class="slide-number">05 / 10</span>
     </div>
 
-    <!-- SLIDE 5: ALBERT - R -->
-    <div class="slide" data-index="4">
+    <!-- SLIDE 5: DESAFÍO 2 (AGOS) -->
+    <div class="slide quiz-slide" data-index="5">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="quiz-header">🔐 Desafío 2 · Modo Analista</div>
+            <div class="quiz-question">
+                En la fase de Acción, ¿cuál es el <strong>peor error</strong> que puede cometer un desarrollador al hablar con un reclutador?
+            </div>
+            <div class="quiz-options" id="quiz2">
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot blue"></span> Decir que trabajó en equipo.
+                </div>
+                <div class="quiz-option" data-correct="true">
+                    <span class="color-dot green"></span> Hablar solo en plural ("hicimos") sin decir qué hizo él específicamente.
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot yellow"></span> Admitir que se equivocó y volvió a intentar.
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot red"></span> Explicar cómo consumió una API.
+                </div>
+            </div>
+            <div class="quiz-feedback" id="feedback2">
+                <div class="speaker">🎤 Agos:</div>
+                <div class="text">"Tal cual. Si no te adueñás de tus acciones, el reclutador no sabe qué sabés hacer vos. Ahora sí, Albert, mostrales el impacto."</div>
+            </div>
+        </div>
+        <span class="slide-number">06 / 10</span>
+    </div>
+
+    <!-- SLIDE 6: ALBERT - R -->
+    <div class="slide" data-index="6">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
         <div class="glow glow-1" style="background: #6bcb77;"></div>
@@ -446,11 +615,44 @@
             </div>
         </div>
         <div class="agent-letter" style="color: #6bcb77;">R</div>
-        <span class="slide-number">05 / 07</span>
+        <span class="slide-number">07 / 10</span>
     </div>
 
-    <!-- SLIDE 6: ANAHÍ -->
-    <div class="slide" data-index="5">
+    <!-- SLIDE 7: DESAFÍO 3 (ALBERT) -->
+    <div class="slide quiz-slide" data-index="7">
+        <div class="bg-grid"></div>
+        <div class="bg-scanline"></div>
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+        <div class="content">
+            <div class="quiz-header">🔐 Desafío 3 · Esencia CAR</div>
+            <div class="quiz-question">
+                ¿Por qué el método CAR es el <strong>arma secreta</strong> de un Junior sin experiencia laboral previa?
+            </div>
+            <div class="quiz-options" id="quiz3">
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot blue"></span> Porque te hace parecer senior mágicamente.
+                </div>
+                <div class="quiz-option" data-correct="true">
+                    <span class="color-dot green"></span> Porque demuestra con hechos y lógica tu potencial real.
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot yellow"></span> Porque te ayuda a memorizar el currículum.
+                </div>
+                <div class="quiz-option" data-correct="false">
+                    <span class="color-dot red"></span> Porque es una fórmula matemática para hackear sistemas.
+                </div>
+            </div>
+            <div class="quiz-feedback" id="feedback3">
+                <div class="speaker">🎤 Albert:</div>
+                <div class="text">"Exacto, agentes del público. El CAR transforma el 'no tengo experiencia' en 'sé cómo resolver problemas'. Anahí, el escenario es tuyo."</div>
+            </div>
+        </div>
+        <span class="slide-number">08 / 10</span>
+    </div>
+
+    <!-- SLIDE 8: ANAHÍ -->
+    <div class="slide" data-index="8">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
         <div class="glow glow-1"></div>
@@ -469,11 +671,11 @@
                 <strong>Somos el equipo CAR. Y esto recién empieza.</strong>
             </div>
         </div>
-        <span class="slide-number">06 / 07</span>
+        <span class="slide-number">09 / 10</span>
     </div>
 
-    <!-- SLIDE 7: CIERRE -->
-    <div class="slide" data-index="6">
+    <!-- SLIDE 9: CIERRE -->
+    <div class="slide" data-index="9">
         <div class="bg-grid"></div>
         <div class="bg-scanline"></div>
         <div class="glow glow-1"></div>
@@ -492,7 +694,7 @@
                 Misión cumplida. Por ahora.
             </div>
         </div>
-        <span class="slide-number">07 / 07</span>
+        <span class="slide-number">10 / 10</span>
     </div>
 
 </div>
@@ -512,8 +714,11 @@
     const total = slides.length;
 
     function updateNav() {
+        const quizSlide = slides[current];
+        const answered = quizSlide.dataset.answered === 'true';
+        const isQuiz = quizSlide.classList.contains('quiz-slide');
+        nextBtn.disabled = current === total - 1 || (isQuiz && !answered);
         prevBtn.disabled = current === 0;
-        nextBtn.disabled = current === total - 1;
         progressBar.style.width = `${((current + 1) / total) * 100}%`;
     }
 
@@ -522,13 +727,13 @@
         slides.forEach((s, i) => {
             s.classList.remove('active', 'exit');
             if (i === index) s.classList.add('active');
-            if (i === current) {
-                if (index > current) s.classList.add('exit');
-                else s.classList.add('exit');
-            }
+            if (i === current) s.classList.add('exit');
         });
         current = index;
         updateNav();
+        setTimeout(() => {
+            slides.forEach(s => s.classList.remove('exit'));
+        }, 800);
     }
 
     prevBtn.addEventListener('click', () => {
@@ -540,14 +745,44 @@
     });
 
     document.addEventListener('keydown', (e) => {
+        const quizSlide = slides[current];
+        const answered = quizSlide.dataset.answered === 'true';
+        const isQuiz = quizSlide.classList.contains('quiz-slide');
         if (e.key === 'ArrowRight' || e.key === ' ') {
             e.preventDefault();
-            if (current < total - 1) goTo(current + 1);
+            if (current < total - 1 && !(isQuiz && !answered)) goTo(current + 1);
         }
         if (e.key === 'ArrowLeft') {
             e.preventDefault();
             if (current > 0) goTo(current - 1);
         }
+    });
+
+    // --- QUIZ LOGIC ---
+    document.querySelectorAll('.quiz-options').forEach((optionsContainer) => {
+        const options = optionsContainer.querySelectorAll('.quiz-option');
+        const slide = optionsContainer.closest('.slide');
+        const feedbackId = optionsContainer.id.replace('quiz', 'feedback');
+        const feedback = document.getElementById(feedbackId);
+
+        options.forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (opt.classList.contains('disabled')) return;
+
+                const isCorrect = opt.dataset.correct === 'true';
+
+                options.forEach(o => {
+                    o.classList.add('disabled');
+                    if (o.dataset.correct === 'true') o.classList.add('correct');
+                    if (o === opt && !isCorrect) o.classList.add('wrong');
+                });
+
+                if (isCorrect) opt.classList.add('correct');
+                slide.dataset.answered = 'true';
+                feedback.classList.add('show');
+                updateNav();
+            });
+        });
     });
 
     updateNav();
@@ -565,31 +800,23 @@
         gainNode.gain.value = 0.08;
         gainNode.connect(audioCtx.destination);
 
-        // Spy bass line loop (low dramatic notes)
         const notes = [130.81, 146.83, 164.81, 174.61, 185.00, 196.00, 220.00, 246.94];
         let step = 0;
         let interval;
 
         function playNote() {
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
             const osc = audioCtx.createOscillator();
             const noteGain = audioCtx.createGain();
-
             osc.type = 'sawtooth';
             osc.frequency.value = notes[step % notes.length] * 0.5;
-
             noteGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
             noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
-
             osc.connect(noteGain);
             noteGain.connect(gainNode);
-
             osc.start(audioCtx.currentTime);
             osc.stop(audioCtx.currentTime + 0.6);
-
             step++;
-
             if (step % 4 === 0) {
                 const osc2 = audioCtx.createOscillator();
                 const g2 = audioCtx.createGain();
@@ -607,7 +834,6 @@
         playNote();
         interval = setInterval(playNote, 800);
 
-        // Add subtle drone
         const drone = audioCtx.createOscillator();
         const droneGain = audioCtx.createGain();
         drone.type = 'sine';
