@@ -943,29 +943,53 @@
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const now = audioCtx.currentTime;
 
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.linearRampToValueAtTime(440, now + 0.15);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-        osc.connect(gain);
-        gain.connect(masterGain || audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.2);
+        // Sirena de alarma (dos tonos alternantes, fuerte e intermitente)
+        const siren1 = audioCtx.createOscillator();
+        const siren1Gain = audioCtx.createGain();
+        siren1.type = 'sawtooth';
+        siren1.frequency.setValueAtTime(220, now);
+        siren1.frequency.linearRampToValueAtTime(440, now + 0.08);
+        siren1.frequency.linearRampToValueAtTime(220, now + 0.16);
+        siren1.frequency.linearRampToValueAtTime(440, now + 0.24);
+        siren1.frequency.linearRampToValueAtTime(220, now + 0.32);
+        siren1.frequency.linearRampToValueAtTime(440, now + 0.40);
+        siren1Gain.gain.setValueAtTime(0.15, now);
+        siren1Gain.gain.setValueAtTime(0.15, now + 0.35);
+        siren1Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        siren1.connect(siren1Gain);
+        siren1Gain.connect(masterGain || audioCtx.destination);
+        siren1.start(now);
+        siren1.stop(now + 0.45);
 
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'square';
-        osc2.frequency.setValueAtTime(660, now + 0.1);
-        osc2.frequency.linearRampToValueAtTime(330, now + 0.25);
-        gain2.gain.setValueAtTime(0.06, now + 0.1);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-        osc2.connect(gain2);
-        gain2.connect(masterGain || audioCtx.destination);
-        osc2.start(now + 0.1);
-        osc2.stop(now + 0.3);
+        // Alarma aguda (efecto de alerta entrecortada)
+        for (let b = 0; b < 5; b++) {
+            const beep = audioCtx.createOscillator();
+            const beepGain = audioCtx.createGain();
+            beep.type = 'square';
+            beep.frequency.value = 1200;
+            const t = now + b * 0.1;
+            beepGain.gain.setValueAtTime(0.12, t);
+            beepGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+            beep.connect(beepGain);
+            beepGain.connect(masterGain || audioCtx.destination);
+            beep.start(t);
+            beep.stop(t + 0.04);
+        }
+
+        // Ruido (explosión de estática tipo alerta máxima)
+        for (let n = 0; n < 8; n++) {
+            const noise = audioCtx.createOscillator();
+            const noiseGain = audioCtx.createGain();
+            noise.type = 'sawtooth';
+            noise.frequency.value = 200 + Math.random() * 4000;
+            const t = now + n * 0.03;
+            noiseGain.gain.setValueAtTime(0.05, t);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+            noise.connect(noiseGain);
+            noiseGain.connect(masterGain || audioCtx.destination);
+            noise.start(t);
+            noise.stop(t + 0.02);
+        }
     }
 
     // --- NAVEGACIÓN ---
